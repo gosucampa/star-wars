@@ -5,7 +5,7 @@ import {baseUrl, periodMonth} from "../utils/constants.js";
 const Contact = () => {
     const [planets, setPlanets] = useState(() => {
         const planets = JSON.parse(localStorage.getItem('planets'));
-        if (planets && (Date.now() - planets.time < periodMonth)) {
+        if (planets && (Date.now() - planets.timestamp < periodMonth)) {
             return planets.payload;
         } else {
             return ['wait...']
@@ -14,9 +14,9 @@ const Contact = () => {
 
     useEffect(() => {
         const getPlanets = async () => {
-            const res = await fetch(`${baseUrl}/v1/planets`)
+            const res = await fetch(`${baseUrl}/planets/`)
             const data = await res.json()
-            const planets = data.map(item => item.name).sort();
+            const planets = data.result.map(item => item.name).sort();
             setPlanets(planets);
             localStorage.setItem('planets', JSON.stringify({
                 payload: planets,
@@ -57,7 +57,7 @@ const Contact = () => {
                     name="subject" placeholder="Write something.."
                 ></textarea>
             </label>
-            <button className="self-start py-3 px-10
+            <button className="self-start py-3 px-10 cursor-pointer
             bg-danger text-main border border-main rounded-md text-center hover:bg-red-500 hover:text-white"
                     type="submit">Submit
             </button>
