@@ -4,8 +4,11 @@ import Home from "./Home.jsx";
 import StarWars from "./StarWars.jsx";
 import AboutMe from "./AboutMe.jsx";
 import Contact from "./Contact.jsx";
+import {useContext} from "react";
+import {SWContext} from "../utils/context.js";
 
-const Main = ({page}) => {
+const Main = () => {
+    const {page} = useContext(SWContext);
 
     switch (page) {
         case navItems[1]:

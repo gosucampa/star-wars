@@ -1,68 +1,69 @@
 import {useEffect, useState} from "react";
 import {baseUrl, periodMonth} from "../utils/constants.js";
-import './Contact.css';
 
 
 const Contact = () => {
     const [planets, setPlanets] = useState(() => {
         const planets = JSON.parse(localStorage.getItem('planets'));
-        if(planets && (Date.now() - planets.timestamp < periodMonth)){
+        if (planets && (Date.now() - planets.time < periodMonth)) {
             return planets.payload;
+        } else {
+            return ['wait...']
         }
-    })
+    });
 
     useEffect(() => {
-        if(planets && planets.length > 0) return;
+        const getPlanets = async () => {
+            const res = await fetch(`${baseUrl}/v1/planets`)
+            const data = await res.json()
+            const planets = data.map(item => item.name).sort();
+            setPlanets(planets);
+            localStorage.setItem('planets', JSON.stringify({
+                payload: planets,
+                timestamp: Date.now()
+            }));
+        }
 
-        fetch(`${baseUrl}/v1/planets`)
-            .then(response => response.json())
-            .then(data => {
-                const planetsList = data.map(planet => planet.name).sort();
-                setPlanets(planetsList);
-                localStorage.setItem('planets', JSON.stringify({
-                    payload: planetsList,
-                    timestamp: Date.now()
-                }))
-            })
-            .catch(err => console.log("Error fetching planets:", err));
-    }, []);
+        if (planets.length === 1) {
+            getPlanets().then(() => console.log('Planets were loaded'))
+        }
+        return () => console.log('Contact components unmounted');
+    }, [])
 
     return (
-        <>
-            {!!planets && planets.length > 0 && (
-                <div className="container">
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        console.log("Form submitted!");
-                    }}>
-                        <label htmlFor="fname">First Name</label>
-                        <input type="text" id="fname" name="firstname" placeholder="Your name.." />
+        <form className="clear-both flex flex-col gap-4  p-5 rounded-md " onSubmit={(e) => {
+            e.preventDefault();
+        }}>
+            <label className="flex flex-col text-main">First Name
+                <input className="w-full p-3 border border-main rounded-md mt-1.5 mb-4 bg-gray-700/60 text-main/70"
+                       type="text" name="firstname" placeholder="Your name.."/>
+            </label>
+            <label className="flex flex-col text-main">Last Name
+                <input className="p-3 border border-main rounded-md mt-1.5 mb-4 bg-gray-700/60 text-main/70"
+                       type="text" name="lastname" placeholder="Your last name.."/>
+            </label>
+            <label className="flex flex-col text-main">Planet
+                <select
+                    className="p-3 border border-main rounded-md mt-1.5 mb-4 bg-gray-700/60 text-main/70 cursor-pointer"
+                    name="planet">
+                    <option value="" className="text-black">Choose planet...</option>
+                    {planets.map(item => <option value={item} key={item}>{item}</option>)}
+                </select>
+            </label>
 
-                        <label htmlFor="lname">Last Name</label>
-                        <input type="text" id="lname" name="lastname" placeholder="Your last name.." />
+            <label className="flex flex-col text-main ">Subject
+                <textarea
+                    className="p-3 border border-main rounded-md mt-1.5 mb-4 bg-gray-700/60 h-32"
+                    name="subject" placeholder="Write something.."
+                ></textarea>
+            </label>
+            <button className="self-start py-3 px-10
+            bg-danger text-main border border-main rounded-md text-center hover:bg-red-500 hover:text-white"
+                    type="submit">Submit
+            </button>
+        </form>
+    )
+}
 
-                        <label htmlFor="planet">Planet</label>
-                        <select id="planet" name="planet" className="btn-danger">
-                            <option value="">Choose planet...</option>
-                            {planets.map(item => (
-                                <option key={item} value={item}>{item}</option>
-                            ))}
-                        </select>
-
-                        <label htmlFor="subject">Subject</label>
-                        <textarea
-                            id="subject"
-                            name="subject"
-                            placeholder="Write something.."
-                            style={{ height: '200px' }}
-                        ></textarea>
-
-                        <input className="btn-danger" type="submit" value="Submit" />
-                    </form>
-                </div>
-            )}
-        </>
-    );
-};
 
 export default Contact;

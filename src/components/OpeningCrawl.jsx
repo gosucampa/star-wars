@@ -9,7 +9,7 @@ const OpeningCrawl = () => {
     useEffect(() => {
         if(!openingCrawl){
             const episode = Math.floor(Math.random() * 6 + 1)
-            fetch(`${baseUrl}/v1/films/${episode}`)
+            fetch(`${baseUrl}/films/${episode}`)
                 .then(res => res.json())
                 .then(data => {
                     setOpeningCrawl(data.opening_crawl);
@@ -22,15 +22,14 @@ const OpeningCrawl = () => {
 
     if(openingCrawl) {
         return (
-            <p className="far-galaxy fs-2 lh-2">
+            <p className="text-justify text-3xl leading-normal tracking-widest">
                 {openingCrawl}
             </p>
         )
     }else {
         return  (
-            <p className={'far-galaxy fs-2 lh-2'}>
-                <span className={'spinner-border'}></span>
-                Loading <span className={'spinner-grow spinner-grow-sm'}>...</span>
+            <p className="text-justify text-3xl leading-normal">
+                Loading...
             </p>
         )
     }
